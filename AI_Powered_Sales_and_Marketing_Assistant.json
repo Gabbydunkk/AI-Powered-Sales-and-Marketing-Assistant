@@ -1,0 +1,364 @@
+{
+  "name": "AI-Powered Sales and Marketing Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1gxO_xVfdPlhOdHbV3J4EvwgEsoviIbAUCISq0-4VIC4",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gxO_xVfdPlhOdHbV3J4EvwgEsoviIbAUCISq0-4VIC4/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "95a83e8b-36e3-47c8-9b8d-a1b3880b53b1",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "Vtfnq7ZFkWEp8J6t",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.CompanyWebsite }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "7070fb02-87e6-4ef4-9c67-b25398bf7b28",
+      "name": "HTTP Request",
+      "retryOnFail": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "c93fa267-b941-4031-b3f8-7c9c2011a202",
+              "leftValue": "={{ $json.error.message }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "999fe788-b0d7-4ea0-adee-62a70bdd309d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "url": "=http://api.scraperapi.com?api_key=13c9114fcd83c4c1eba0e2c9d826ec35&url={{ $('Google Sheets Trigger').item.json.CompanyWebsite }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        -100
+      ],
+      "id": "6da91f40-9069-499c-8f0e-1fa6b671f13b",
+      "name": "SCRAPPER"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1gxO_xVfdPlhOdHbV3J4EvwgEsoviIbAUCISq0-4VIC4",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 618066027,
+          "mode": "list",
+          "cachedResultName": "Sheet2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1gxO_xVfdPlhOdHbV3J4EvwgEsoviIbAUCISq0-4VIC4/edit#gid=618066027"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            " Company Name": "={{ $json.CompanyName }}",
+            "Website": "={{ $json.Website }}",
+            "Scraped Data": "={{ $json.ScrapedData }}",
+            "Result Status": "={{ $json.ResultStatus }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": " Company Name",
+              "displayName": " Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Scraped Data",
+              "displayName": "Scraped Data",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Result Status",
+              "displayName": "Result Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1320,
+        -100
+      ],
+      "id": "f835c05c-6f8d-4e88-9ef9-7b7379550ca6",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleApi": {
+          "id": "FfMGyKkEjtBrdkUd",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are an expert business analyst. Your job is to read the raw HTML of a company's website and extract key business information in a clean, concise format. Please analyze the following HTML content and provide a summary. From the content, identify the main headline, the company's public tagline or slogan, and a one-sentence summary of what the company does. Format the output exactly like this:\\n\\nHeadline: [Main headline here]\\nTagline: [Tagline here]\\nSummary: [One-sentence summary here]\\n\\nHere is the HTML:\\n\\n{{ $json.data }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [
+        880,
+        100
+      ],
+      "id": "2dc22b8f-2dba-4431-afea-39244be1822e",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        440
+      ],
+      "id": "9ed62a57-e986-4ae6-88af-6a61095e5992",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "muldXLite6ocPV8W",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e09e9bbc-6c00-4417-bed6-b25d8989ec38",
+              "name": "CompanyName",
+              "value": "={{ $('Google Sheets Trigger').item.json.CompanyName }}",
+              "type": "string"
+            },
+            {
+              "id": "54e48e88-201e-42b2-80af-059a6af4a807",
+              "name": "Website",
+              "value": "={{ $('Google Sheets Trigger').item.json.CompanyWebsite }}",
+              "type": "string"
+            },
+            {
+              "id": "1b7e2e5d-d53c-444d-898e-dd708ce0f8ab",
+              "name": "ScrapedData",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            },
+            {
+              "id": "f28ccde1-d541-49fe-8803-301ce01b443f",
+              "name": "ResultStatus",
+              "value": "={{ $nodes[\"Basic LLM Chain\"].json.text.startsWith(\"Headline:\") ? \"Success (AI Processed)\" : \"Failure: AI or Scraper Error\" }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1240,
+        100
+      ],
+      "id": "0d46d8d3-0069-499b-9116-32d039c7fee5",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "SCRAPPER",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SCRAPPER": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "81d97421-1c1c-4f25-8cf8-656d5206359a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "01ff9519183080c8ca11e2f53a26a9bb8d6db974040ea61b5433dbf5d783bedf"
+  },
+  "id": "aCZTbqzBi0IGFLE9",
+  "tags": []
+}
